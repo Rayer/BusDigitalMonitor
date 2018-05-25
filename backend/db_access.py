@@ -16,7 +16,7 @@ class Sensitive_Data:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        self.conn.close()
 
     def get(self, name):
         return self.dict[name]

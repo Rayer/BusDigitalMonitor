@@ -12,6 +12,6 @@ class AuthSanity(unittest.TestCase):
             app_key = sd.get('app_key_l1')
 
         auth.init(app_id, app_key)
-        response = request('get', 'http://ptx.transportdata.tw/MOTC/v2/Bus/Stop/City/Taipei?$top=30&$format=JSON', headers=auth.get_auth_header())
+        response = request('get', 'http://ptx.transportdata.tw/MOTC/v2/Bus/Station/City/Taipei?$top=30&$format=JSON', headers=auth.get_auth_header())
         self.assertEqual(response.status_code, 200)
 

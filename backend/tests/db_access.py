@@ -8,6 +8,7 @@ import utils.db_access
 base_api_url = 'http://ptx.transportdata.tw/MOTC/'
 bus_stop_resource = 'v2/Bus/Stop/City/Taipei?$top={data_per_session}&$skip={data_start_point}&$format=JSON'
 bus_station_resource = 'v2/Bus/Station/City/Taipei?$top={data_per_session}&$skip={data_start_point}&$format=JSON'
+bus_route_resource = 'v2/Bus/StopOfRoute/City/Taipei?$top={data_per_session}&$skip={data_start_point}&$format=JSON'
 configuration = {'data_per_session': 1000, 'data_start_point': 0}
 
 
@@ -26,35 +27,26 @@ class DBInsertStopData(unittest.TestCase):
         self.auth.init(app_id, app_key)
 
     def test_insert_stop(self):
-
-        conf = configuration.copy()
-        with utils.db_access.BusStopData() as bsd:
-            bsd.drop_data()
-            while True:
-                response = request('get', get_session_url(bus_stop_resource, conf), headers=self.auth.get_auth_header())
-                conf['data_start_point'] += conf['data_per_session']
-                if response.content.__len__() < 5:
-                    break
-                content = response.content.decode('utf8')
-                stops = json.loads(content)
-                for stop in stops:
-                    bsd.write_entry(stop)
-
-                print('Current pass : {}'.format(conf['data_start_point']))
+        self.fill_into_db(utils.db_access.BusStopData, bus_stop_resource)
 
     def test_insert_station(self):
+        self.fill_into_db(utils.db_access.BusStationData, bus_station_resource)
 
+    def test_insert_route(self):
+        self.fill_into_db(utils.db_access.BusRouteData, bus_route_resource)
+
+    def fill_into_db(self, db_writer, url_resource):
         conf = configuration.copy()
-        with utils.db_access.BusStationData() as bsd:
-            bsd.drop_data()
+        with db_writer() as db:
+            db.drop_data()
             while True:
-                response = request('get', get_session_url(bus_station_resource, conf), headers=self.auth.get_auth_header())
+                response = request('get', get_session_url(url_resource, conf), headers=self.auth.get_auth_header())
                 conf['data_start_point'] += conf['data_per_session']
                 if response.content.__len__() < 5:
                     break
                 content = response.content.decode('utf8')
                 stops = json.loads(content)
                 for stop in stops:
-                    bsd.write_entry(stop)
+                    db.write_entry(stop)
 
                 print('Current pass : {}'.format(conf['data_start_point']))

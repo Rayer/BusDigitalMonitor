@@ -80,7 +80,8 @@ class BusStationData(CommonDataInterface):
         if stop_routes is not None:
             for stop_route in stop_routes:
                 stop_route_value.append((stop_route.get('StopUID'), stop_route.get('StopID'),
-                                         stop_route.get('RouteUID'), stop_route.get('RouteID'), stop_route['RouteName'].get('Zh_tw')))
+                                         stop_route.get('RouteUID'), stop_route.get('RouteID'),
+                                         stop_route['RouteName'].get('Zh_tw')))
         data_entry.update({'stop_routes': json.dumps(stop_route_value)})
         self.write_db(data_entry)
 
@@ -109,6 +110,16 @@ class BusStopData(CommonDataInterface):
             'version': stop_info['VersionID']
         }
         self.write_db(data_entry)
+
+
+class BusRouteData(CommonDataInterface):
+
+    def __init__(self):
+        super().__init__('bmd_route')
+
+    def write_db(self, data_entry):
+        pass
+
 
 
 if __name__ == '__main__':
